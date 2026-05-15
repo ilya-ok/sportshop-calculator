@@ -1,0 +1,885 @@
+/* ==========================================================================
+   SSC Frontend Calculator Styles
+   ========================================================================== */
+
+.ssc-calculator {
+    font-size: 15px;
+    color: #1d2327;
+    line-height: 1.5;
+    max-width: 1100px;
+    margin: 0 auto;
+}
+.ssc-calculator * { box-sizing: border-box; }
+
+/* --------------------------------------------------------------------------
+   Секции
+   -------------------------------------------------------------------------- */
+.ssc-step {
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+    margin-bottom: 16px;
+    padding-bottom: 14px;
+    border-bottom: 1px solid #eee;
+}
+.ssc-step:last-of-type { border-bottom: none; }
+
+.ssc-section-title {
+    font-size: 13px;
+    font-weight: 700;
+    margin: 0;
+    color: #262626;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    text-align: right;
+    white-space: nowrap;
+    flex-shrink: 0;
+    width: 200px;
+}
+
+.ssc-step > .ssc-section-title {
+    align-self: flex-start;
+}
+.ssc-step > .ssc-section-title::after {
+    content: ':';
+}
+
+/* Контент шага */
+.ssc-step__content {
+    flex: 1;
+    max-width: 900px;
+    min-width: 0;
+}
+.ssc-step__placeholder {
+    margin-top: 5px;
+}
+.ssc-placeholder-text {
+    font-size: 13px;
+    color: #999;
+    font-style: italic;
+    margin: 0;
+}
+
+/* --------------------------------------------------------------------------
+   Фильтр атрибутов
+   -------------------------------------------------------------------------- */
+.ssc-subcategory-select {
+    width: 100%;
+    max-width: 360px;
+    padding: 7px 32px 7px 10px;
+    border: 2px solid #c3c4c7;
+    border-radius: 3px;
+    font-size: 14px;
+    background: #fff;
+    color: #1d2327;
+    cursor: pointer;
+    transition: border-color 0.15s;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 16 16'%3E%3Cpath fill='%23555' d='M4 6l4 4 4-4z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 10px center;
+    padding-right: 36px;
+}
+.ssc-subcategory-select:focus {
+    outline: none;
+    border-color: #8bc73f;
+    box-shadow: 0 0 0 2px rgba(139,199,63,0.15);
+}
+
+.ssc-filter-wrap { margin-bottom: 12px; }
+.ssc-filter-attr {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 8px;
+    flex-wrap: wrap;
+    transition: opacity 0.2s;
+}
+.ssc-filter-attr--loading {
+    opacity: 0.4;
+    pointer-events: none;
+}
+.ssc-filter-attr__label {
+    font-weight: 600;
+    font-size: 13px;
+    color: #555;
+    min-width: 130px;
+    flex-shrink: 0;
+}
+.ssc-filter-attr__values {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+.ssc-filter-check {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 4px 12px 2px;
+    border: 1px solid #c3c4c7;
+    border-radius: 3px;
+    background: #f6f7f7;
+    cursor: pointer;
+    font-size: 13px;
+    transition: border-color 0.15s, background 0.15s;
+}
+.ssc-filter-check:has(input:checked),
+.ssc-filter-check--active {
+    border-color: #8bc73f;
+    background: #eef5e0;
+    color: #8bc73f;
+}
+.ssc-filter-check--disabled {
+    opacity: 0.4;
+    cursor: default;
+    pointer-events: none;
+}
+.ssc-filter-check--disabled:has(input:checked) {
+    opacity: 0.6;
+}
+.ssc-filter-check input { display: none; }
+
+/* --------------------------------------------------------------------------
+   Кнопка выбора покрытия
+   -------------------------------------------------------------------------- */
+.ssc-select-product-btn {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    max-width: 600px;
+    padding: 9px 14px;
+    border: 2px solid #8bc73f;
+    border-radius: 3px;
+    background: #eef5e0;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 600;
+    color: #1d2327;
+    transition: background 0.15s, border-color 0.15s;
+    margin: 0 0 8px;
+}
+.ssc-select-product-btn:hover {
+    background: #e4f0d4;
+    border-color: #6fa32e;
+}
+.ssc-select-product-btn__label {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+.ssc-select-product-btn__text {
+    text-align: left;
+}
+.ssc-select-product-btn__count {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: #1d2327;
+    font-size: 14px;
+    font-weight: 700;
+    line-height: 1;
+}
+.ssc-select-product-btn__count::before { content: '('; }
+.ssc-select-product-btn__count::after { content: ')'; }
+.ssc-select-product-btn__arrow {
+    display: block;
+    width: 10px;
+    height: 10px;
+    border-right: 2px solid #8bc73f;
+    border-bottom: 2px solid #8bc73f;
+    transform: rotate(45deg);
+    margin-left: 10px;
+    flex-shrink: 0;
+}
+
+/* Анимация загрузки на кнопке */
+.ssc-select-product-btn.ssc-btn--loading {
+    position: relative;
+    pointer-events: none;
+    overflow: hidden;
+}
+.ssc-select-product-btn.ssc-btn--loading::before {
+    content: '';
+    position: absolute;
+    inset: -4px;
+    background-image: repeating-linear-gradient(
+        90deg,
+        #eef5e0 0%, #eef5e0 1.5625%,
+        #b8d88a 1.5625%, #b8d88a 3.125%,
+        #eef5e0 3.125%, #eef5e0 4.6875%,
+        #b8d88a 4.6875%, #b8d88a 6.25%,
+        #eef5e0 6.25%, #eef5e0 7.8125%,
+        #b8d88a 7.8125%, #b8d88a 9.375%,
+        #eef5e0 9.375%, #eef5e0 10.9375%,
+        #b8d88a 10.9375%, #b8d88a 12.5%,
+        #eef5e0 12.5%, #eef5e0 14.0625%,
+        #b8d88a 14.0625%, #b8d88a 15.625%,
+        #eef5e0 15.625%, #eef5e0 17.1875%,
+        #b8d88a 17.1875%, #b8d88a 18.75%,
+        #eef5e0 18.75%, #eef5e0 20.3125%,
+        #b8d88a 20.3125%, #b8d88a 21.875%,
+        #eef5e0 21.875%, #eef5e0 23.4375%,
+        #b8d88a 23.4375%, #b8d88a 25%,
+        #eef5e0 25%, #eef5e0 26.5625%,
+        #b8d88a 26.5625%, #b8d88a 28.125%,
+        #eef5e0 28.125%, #eef5e0 29.6875%,
+        #b8d88a 29.6875%, #b8d88a 31.25%,
+        #eef5e0 31.25%, #eef5e0 32.8125%,
+        #b8d88a 32.8125%, #b8d88a 34.375%,
+        #eef5e0 34.375%, #eef5e0 35.9375%,
+        #b8d88a 35.9375%, #b8d88a 37.5%,
+        #eef5e0 37.5%, #eef5e0 39.0625%,
+        #b8d88a 39.0625%, #b8d88a 40.625%,
+        #eef5e0 40.625%, #eef5e0 42.1875%,
+        #b8d88a 42.1875%, #b8d88a 43.75%,
+        #eef5e0 43.75%, #eef5e0 45.3125%,
+        #b8d88a 45.3125%, #b8d88a 46.875%,
+        #eef5e0 46.875%, #eef5e0 48.4375%,
+        #b8d88a 48.4375%, #b8d88a 50%,
+        #eef5e0 50%, #eef5e0 51.5625%,
+        #b8d88a 51.5625%, #b8d88a 53.125%,
+        #eef5e0 53.125%, #eef5e0 54.6875%,
+        #b8d88a 54.6875%, #b8d88a 56.25%,
+        #eef5e0 56.25%, #eef5e0 57.8125%,
+        #b8d88a 57.8125%, #b8d88a 59.375%,
+        #eef5e0 59.375%, #eef5e0 60.9375%,
+        #b8d88a 60.9375%, #b8d88a 62.5%,
+        #eef5e0 62.5%, #eef5e0 64.0625%,
+        #b8d88a 64.0625%, #b8d88a 65.625%,
+        #eef5e0 65.625%, #eef5e0 67.1875%,
+        #b8d88a 67.1875%, #b8d88a 68.75%,
+        #eef5e0 68.75%, #eef5e0 70.3125%,
+        #b8d88a 70.3125%, #b8d88a 71.875%,
+        #eef5e0 71.875%, #eef5e0 73.4375%,
+        #b8d88a 73.4375%, #b8d88a 75%,
+        #eef5e0 75%, #eef5e0 76.5625%,
+        #b8d88a 76.5625%, #b8d88a 78.125%,
+        #eef5e0 78.125%, #eef5e0 79.6875%,
+        #b8d88a 79.6875%, #b8d88a 81.25%,
+        #eef5e0 81.25%, #eef5e0 82.8125%,
+        #b8d88a 82.8125%, #b8d88a 84.375%,
+        #eef5e0 84.375%, #eef5e0 85.9375%,
+        #b8d88a 85.9375%, #b8d88a 87.5%,
+        #eef5e0 87.5%, #eef5e0 89.0625%,
+        #b8d88a 89.0625%, #b8d88a 90.625%,
+        #eef5e0 90.625%, #eef5e0 92.1875%,
+        #b8d88a 92.1875%, #b8d88a 93.75%,
+        #eef5e0 93.75%, #eef5e0 95.3125%,
+        #b8d88a 95.3125%, #b8d88a 96.875%,
+        #eef5e0 96.875%, #eef5e0 98.4375%,
+        #b8d88a 98.4375%, #b8d88a 100%
+    );
+    background-size: 200% 100%;
+    animation: ssc-btn-shimmer 4s infinite linear;
+    filter: blur(2px);
+    z-index: 0;
+}
+.ssc-select-product-btn.ssc-btn--loading > * {
+    position: relative;
+    z-index: 1;
+}
+@keyframes ssc-btn-shimmer {
+    0% { background-position: 0% 0; }
+    100% { background-position: 100% 0; }
+}
+
+/* --------------------------------------------------------------------------
+   Список товаров
+   -------------------------------------------------------------------------- */
+.ssc-products-list {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    max-height: 600px;
+    overflow-y: auto;
+}
+.ssc-product-card {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 10px;
+    border: 2px solid #e2e2e2;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: border-color 0.15s;
+    width: 100%;
+    background: #fff;
+}
+.ssc-product-card:has(input:checked),
+.ssc-product-card--active {
+    border-color: #8bc73f;
+    background: #f0f5e6;
+}
+.ssc-product-card input[type="radio"] { display: none; }
+.ssc-prod-img {
+    width: 30px;
+    height: 30px;
+    object-fit: cover;
+    border-radius: 2px;
+    flex-shrink: 0;
+}
+.ssc-prod-info {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    flex-wrap: nowrap;
+    gap: 8px;
+}
+.ssc-prod-name {
+    display: inline;
+    font-weight: 600;
+    font-size: 13px;
+    line-height: 1.3;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.ssc-prod-price {
+    display: inline;
+    font-size: 13px;
+    font-weight: 700;
+    color: #8bc73f;
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+.ssc-prod-attrs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 2px 10px;
+}
+.ssc-prod-attr { font-size: 11px; color: #666; }
+.ssc-no-products, .ssc-products-loading {
+    color: #888;
+    font-style: italic;
+    font-size: 14px;
+}
+
+/* --------------------------------------------------------------------------
+   Параметры рулона
+   -------------------------------------------------------------------------- */
+.ssc-roll-params {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+.ssc-roll-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+.ssc-roll-row__label {
+    font-size: 13px;
+    color: #444;
+    min-width: 120px;
+    flex-shrink: 0;
+    margin-top: 5px;
+}
+.ssc-width-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    margin-top: 5px;
+}
+.ssc-width-list--has-data {
+    margin-top: 0;
+}
+.ssc-radio-btn {
+    display: flex;
+    gap: 3px;
+    align-items: center;
+    padding: 4px 11px 2px;
+    border: 1px solid #c3c4c7;
+    border-radius: 3px;
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 600;
+    background: #fff;
+    transition: border-color 0.15s, background 0.15s;
+    user-select: none;
+}
+.ssc-radio-btn--active,
+.ssc-radio-btn:has(input:checked) {
+    border-color: #8bc73f;
+    background: #eef5e0;
+    color: #8bc73f;
+}
+.ssc-radio-btn input { display: none; }
+
+.ssc-markup-icon {
+    display: inline-block;
+    width: 17px;
+    height: 17px;
+    object-fit: contain;
+    flex-shrink: 0;
+}
+.ssc-markup-icon--none {
+    font-size: 14px;
+    line-height: 17px;
+    text-align: center;
+    color: #888;
+}
+.ssc-radio-btn--active .ssc-markup-icon--none,
+.ssc-radio-btn:has(input:checked) .ssc-markup-icon--none {
+    color: #8bc73f;
+}
+
+.ssc-length-val {
+    font-size: 15px;
+    font-weight: 600;
+    color: #8bc73f;
+}
+.ssc-placeholder { font-size: 13px; color: #999; font-style: italic; }
+
+/* --------------------------------------------------------------------------
+   Тип разметки
+   -------------------------------------------------------------------------- */
+.ssc-markup-type-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+}
+
+/* --------------------------------------------------------------------------
+   Размеры площадки
+   -------------------------------------------------------------------------- */
+.ssc-dims-and-canvas {
+    display: flex;
+    gap: 16px;
+    align-items: flex-start;
+    flex-wrap: wrap;
+    max-width: 600px;
+    justify-content: center;
+}
+.ssc-dims-fields {
+    display: flex;
+    align-items: flex-end;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+.ssc-field-group {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 3px;
+}
+.ssc-field-group label {
+    font-size: 13px;
+    font-weight: 600;
+    color: #555;
+}
+.ssc-dims-x {
+    font-size: 20px;
+    font-weight: 400;
+    color: #999;
+    padding-bottom: 4px;
+}
+.ssc-dims-eq {
+    font-size: 20px;
+    color: #555;
+    padding-bottom: 6px;
+    white-space: nowrap;
+}
+.ssc-area-result { font-weight: 700; color: #8bc73f; font-size: 20px; }
+
+/* Счётчик +/− */
+.ssc-counter {
+    display: flex;
+    align-items: center;
+    border: 1px solid #c3c4c7;
+    border-radius: 3px;
+    overflow: hidden;
+}
+.ssc-counter .ssc-counter__val {
+    border-top: none;
+    border-bottom: none;
+}
+.ssc-counter__btn {
+    width: 34px;
+    height: 34px;
+    border: none;
+    background: #f6f7f7;
+    cursor: pointer;
+    font-size: 18px;
+    line-height: 1;
+    color: #444;
+    transition: background 0.15s;
+    flex-shrink: 0;
+    display: flex;
+    justify-content: center;
+    align-items: flex-end;
+}
+.ssc-counter__btn:hover { background: #e2e2e2; }
+.ssc-counter__val {
+    width: 60px;
+    height: 34px;
+    border: none;
+    border-left: 1px solid #ddd;
+    border-right: 1px solid #ddd;
+    text-align: center;
+    font-size: 15px;
+    font-weight: 600;
+    -moz-appearance: textfield;
+}
+.ssc-counter__val::-webkit-inner-spin-button,
+.ssc-counter__val::-webkit-outer-spin-button { -webkit-appearance: none; }
+
+/* Canvas */
+.ssc-canvas-wrap {
+    position: relative;
+    width: 100%;
+    max-width: 600px;
+    aspect-ratio: 730 / 365;
+}
+.ssc-canvas-bg {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    object-fit: cover;
+    z-index: 1;
+}
+.ssc-canvas {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 2;
+    border-radius: 3px;
+    border: 1px solid #ddd;
+}
+
+/* --------------------------------------------------------------------------
+   Результаты
+   -------------------------------------------------------------------------- */
+.ssc-results {
+    max-width: 600px;
+}
+
+/* Табличный режим (площадь/клей/лента/песок/крошка с ценами) */
+.ssc-results--table .ssc-result-row {
+    display: grid;
+    grid-template-columns: 1fr 300px 120px; /* Label, Sub+Value, Price */
+    align-items: center;
+    padding: 5px 0;
+    border-bottom: 1px solid #f0f0f0;
+    font-size: 14px;
+    gap: 5px;
+}
+.ssc-results--table .ssc-result-row--info {
+    grid-template-columns: 1fr auto;
+}
+
+.ssc-results--table .ssc-result-sub {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    justify-content: flex-end;
+}
+.ssc-results--table .ssc-result-label-sub {
+    display: none; /* По умолчанию скрыто, показывается JS */
+    color: #555;
+    font-size: 13px;
+    white-space: nowrap;
+}
+/* Для строк "Разметка" подзаголовок виден всегда */
+.ssc-results--table .ssc-res-glue-markup .ssc-result-label-sub,
+.ssc-results--table .ssc-res-tape-markup .ssc-result-label-sub {
+    display: inline;
+}
+.ssc-results--table .ssc-result-label {
+    color: #555;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+}
+.ssc-results--table .ssc-result-label .ssc-checkbox-label {
+    margin: 0;
+    font-size: inherit;
+}
+.ssc-results--table .ssc-result-price {
+    display: block;
+    font-weight: 600;
+    color: #1d2327;
+    text-align: right;
+    white-space: nowrap;
+    min-width: 90px;
+    padding-left: 8px;
+    font-weight: 800;
+}
+.ssc-results--table .ssc-result-val {
+    display: block;
+    font-weight: 600;
+    color: #1d2327;
+    text-align: right;
+    white-space: nowrap;
+}
+.ssc-res-glue-base-val, .ssc-res-glue-markup-val, .ssc-res-tape-base-val, .ssc-res-tape-markup-val {
+    width: 170px;
+}
+.ssc-results--table .ssc-result-row.ssc-res-glue-base, .ssc-results--table .ssc-result-row.ssc-res-tape-base {
+    // border: none;
+}
+
+/* Обычные строки (рулоны, швы) без цен */
+.ssc-result-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 5px 0;
+    border-bottom: 1px solid #f0f0f0;
+    font-size: 14px;
+    gap: 10px;
+}
+.ssc-result-row:last-child { border-bottom: none; }
+
+.ssc-result-label { color: #555; flex-shrink: 0; }
+.ssc-result-val {
+    font-weight: 600;
+    color: #1d2327;
+    text-align: right;
+}
+.ssc-result-price { display: none; }
+
+.ssc-result-row--extra { background: transparent; }
+.ssc-result-row--extra .ssc-result-label { color: #333; }
+
+.ssc-checkbox-label {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    cursor: pointer;
+    font-size: 14px;
+    color: #333;
+    user-select: none;
+}
+.ssc-checkbox-label input[type="checkbox"] {
+    width: 16px;
+    height: 16px;
+    accent-color: #8bc73f;
+    cursor: pointer;
+    flex-shrink: 0;
+}
+
+/* Итого */
+.ssc-total {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 0 0;
+    margin-top: 6px;
+    border-top: 2px solid #8bc73f;
+    font-size: 16px;
+    font-weight: 700;
+    color: #1d2327;
+}
+.ssc-res-total { 
+    color: #8bc73f;
+    font-size: 20px;
+    font-weight: 800;
+}
+
+/* Кнопка КП */
+.ssc-kp-btn-wrap {
+    display: none;
+    margin-top: 12px;
+    max-width: 600px;
+}
+.ssc-kp-btn {
+    display: block;
+    width: 200px;
+    margin: 0 auto;
+    padding: 9px 24px;
+    background: #8bc73f;
+    color: #fff;
+    border: none;
+    border-radius: 3px;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+.ssc-kp-btn:hover { background: #6fa32e; }
+.ssc-kp-btn:disabled { opacity: 0.6; cursor: default; }
+.ssc-kp-error {
+    margin-top: 6px;
+    color: #d63638;
+    font-size: 13px;
+}
+
+/* --------------------------------------------------------------------------
+   Модальное окно КП
+   -------------------------------------------------------------------------- */
+.ssc-modal {
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.ssc-modal__overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(0,0,0,0.5);
+    cursor: pointer;
+}
+.ssc-modal__box {
+    position: relative;
+    background: #fff;
+    border-radius: 6px;
+    padding: 20px 24px;
+    max-width: 420px;
+    width: 90%;
+    box-shadow: 0 8px 30px rgba(0,0,0,0.2);
+    z-index: 1;
+}
+.ssc-modal__close {
+    position: absolute;
+    top: 8px; right: 12px;
+    background: none;
+    border: none;
+    font-size: 16px;
+    cursor: pointer;
+    color: #888;
+}
+.ssc-modal__close:hover { color: #333; }
+.ssc-modal__box h3 { margin: 0 0 4px; font-size: 15px; }
+.ssc-modal__desc { color: #666; font-size: 13px; margin-bottom: 10px; }
+
+.ssc-kp-form { display: flex; flex-direction: column; gap: 6px; }
+.ssc-input {
+    width: 100%;
+    padding: 9px 12px;
+    border: 1px solid #c3c4c7;
+    border-radius: 3px;
+    font-size: 14px;
+    transition: border-color 0.15s;
+}
+.ssc-input:focus {
+    outline: none;
+    border-color: #8bc73f;
+    box-shadow: 0 0 0 2px rgba(139,199,63,0.15);
+}
+.ssc-submit-btn {
+    padding: 9px;
+    background: #8bc73f;
+    color: #fff;
+    border: none;
+    border-radius: 3px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s;
+    margin-top: 2px;
+}
+.ssc-submit-btn:hover { background: #6fa32e; }
+.ssc-submit-btn:disabled { opacity: 0.6; }
+.ssc-form-success {
+    text-align: center;
+    color: #1a7f37;
+    font-weight: 600;
+    padding: 6px;
+}
+.ssc-form-privacy { font-size: 11px; color: #888; text-align: center; }
+.ssc-form-privacy a { color: #888; }
+
+/* --------------------------------------------------------------------------
+   Адаптивность
+   -------------------------------------------------------------------------- */
+@media (max-width: 768px) {
+    .ssc-step { flex-direction: column; gap: 8px; }
+    .ssc-section-title { text-align: left; width: auto; }
+    .ssc-dims-and-canvas { flex-direction: column; }
+    .ssc-canvas-wrap { width: 100%; }
+    .ssc-canvas { width: 100%; height: auto; }
+    .ssc-modal__box { padding: 20px 16px; }
+    .ssc-roll-row { flex-direction: column; align-items: flex-start; gap: 8px; }
+    .ssc-roll-row__label { min-width: unset; }
+}
+
+/* --------------------------------------------------------------------------
+   Magnific Popup — список товаров
+   -------------------------------------------------------------------------- */
+.ssc-product-popup .mfp-content {
+    max-width: 700px;
+    margin: 0 auto;
+    background: #fff;
+    padding: 10px 10px 15px;
+    border-radius: 5px;
+}
+.ssc-product-popup .mfp-close {
+    color: #8bc73f;
+    font-size: 28px;
+    font-weight: 300;
+}
+.ssc-product-popup .mfp-close:hover {
+    background: none;
+}
+.ssc-product-popup .mfp-bg {
+    background: rgba(0,0,0,0.6);
+}
+.ssc-product-popup .ssc-products-list {
+    display: flex !important;
+    flex-direction: column;
+    gap: 6px;
+    max-height: 70vh;
+    overflow-y: auto;
+    padding: 20px 10px;
+}
+.ssc-product-popup .ssc-products-list::-webkit-scrollbar {
+    width: 6px;
+}
+.ssc-product-popup .ssc-products-list::-webkit-scrollbar-thumb {
+    background: #ddd;
+    border-radius: 3px;
+}
+
+.ssc-step--subcategory .ssc-section-title, .ssc-step--markup .ssc-section-title, .ssc-step--results .ssc-section-title, .ssc-step--filter .ssc-section-title, .ssc-step--roll .ssc-section-title {
+    margin-top: 6px;
+}
+
+/* --------------------------------------------------------------------------
+   Сценический линолеум — радио-группы для основания и склейки швов
+   -------------------------------------------------------------------------- */
+/* Scenic group: обёртка для строки radio + строки результата */
+.ssc-scenic-group {
+    border-bottom: 1px solid #f0f0f0;
+}
+
+/* Строка 1: radio-кнопки; sub занимает колонки value+price */
+.ssc-result-row--scenic-radios {
+    border-bottom: none;
+    align-items: center;
+}
+.ssc-results--table .ssc-result-row--scenic-radios .ssc-result-sub {
+    grid-column: 2 / -1;
+    justify-content: flex-start;
+}
+
+/* Строка 2: результат (скрыта по умолчанию) */
+.ssc-result-row--scenic-result {
+    border-bottom: none;
+}
+
+.ssc-results--table .ssc-result-row--scenic-radios .ssc-result-sub.ssc-scenic-sub {
+    flex-direction: column;
+    gap: 6px;
+    align-items: flex-start;
+    padding-top: 2px;
+}
+
+.ssc-scenic-sub .ssc-markup-type-list {
+    flex-wrap: wrap;
+}
+
+
+@media (max-width: 768px) {
+    .ssc-scenic-sub .ssc-markup-type-list {
+        gap: 4px;
+    }
+}
