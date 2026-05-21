@@ -73,8 +73,15 @@ class SSC_Frontend {
 	 * Подключение стилей и скриптов.
 	 */
 	public function enqueue_assets() {
-		// Подключаем только если на странице товара или есть шорткод
-		if ( ! is_product() && ! $this->page_has_calculator_shortcode() ) {
+		// Подключаем только если на странице товара, категории или есть шорткод
+		if ( ! is_product() && ! is_product_category() && ! $this->page_has_calculator_shortcode() ) {
+			return;
+		}
+
+		// На странице категории нужны только стили карточки — скрипты и pdfmake не нужны
+		$category_only = is_product_category() && ! is_product() && ! $this->page_has_calculator_shortcode();
+		if ( $category_only ) {
+			wp_enqueue_style( 'ssc-calculator', SSC_PLUGIN_URL . 'assets/css/calculator.css', array(), SSC_VERSION );
 			return;
 		}
 

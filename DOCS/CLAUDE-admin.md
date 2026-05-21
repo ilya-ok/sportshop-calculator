@@ -50,3 +50,47 @@
 - `ajax_sync_all_calculators()` — все калькуляторы → все сайты. Мерджит поверх существующих (не удаляет чужие).
 - Оба используют `switch_to_blog()` / `restore_current_blog()`.
 - Nonce: `ssc_admin_nonce`.
+
+---
+
+## Карточки категорий (class-ssc-calc-cards-admin.php)
+
+**Класс:** `SSC_Calc_Cards_Admin` (Singleton)
+**Страница:** Калькуляторы → Карточки категорий (`/wp-admin/admin.php?page=ssc-calc-cards`)
+**Опция:** `ssc_calc_card_rules`
+
+### Структура данных
+
+```php
+// wp_options: ssc_calc_card_rules
+[
+    'iskusstvennyj-gazon' => [
+        'title'        => 'Рассчитать площадку',
+        'subtitle'     => '',
+        'tag'          => 'Калькулятор',
+        'bg_image_url' => '/wp-content/calculator/grass.jpg',
+        'link_url'     => '/kalkulyator/',
+    ],
+    // категории без записи → карточка не показывается
+]
+```
+
+Ключ — slug `product_cat`. Запись есть → карточка активна для этой категории и всех дочерних без своего правила.
+
+### UI
+
+Таблица всех `product_cat` (иерархически, с отступами). Поля есть у каждой категории. Если `link_url` пустой — запись не сохраняется (карточка отключена).
+
+**Кнопки:**
+- «Сохранить настройки» — POST-форма, nonce `ssc_calc_cards_save`
+- «Синхронизировать на все города» — AJAX `ssc_sync_calc_cards`, nonce `ssc_calc_cards_nonce` (только в мультисайте)
+
+### AJAX-синхронизация
+
+`ajax_sync()` — копирует всю опцию `ssc_calc_card_rules` на все сайты сети через `switch_to_blog()`. Принцип тот же что у `ajax_sync_all_calculators()`.
+
+### Пути изображений и ссылок
+
+`bg_image_url` хранится как относительный путь (`/wp-content/...`). При рендере в виджете применяется `home_url()` — путь одинаков на всех городах мультисайта.
+
+`link_url` хранится как относительный путь (`/slug/`). При рендере также применяется `home_url($link_url)` — необходимо когда WordPress установлен в подпапке (например `/sportshop/`), иначе ссылка ведёт на `http://localhost/slug/` вместо `http://localhost/sportshop/slug/`.

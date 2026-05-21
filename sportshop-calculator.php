@@ -20,6 +20,8 @@ define( 'SSC_OPTION_KEY', 'ssc_calculators' );
 
 require_once SSC_PLUGIN_DIR . 'includes/class-ssc-admin.php';
 require_once SSC_PLUGIN_DIR . 'includes/class-ssc-frontend.php';
+require_once SSC_PLUGIN_DIR . 'includes/class-ssc-calc-card-widget.php';
+require_once SSC_PLUGIN_DIR . 'includes/class-ssc-calc-cards-admin.php';
 
 /**
  * Инициализация плагина.
@@ -27,10 +29,15 @@ require_once SSC_PLUGIN_DIR . 'includes/class-ssc-frontend.php';
 function ssc_init() {
 	if ( is_admin() ) {
 		SSC_Admin::get_instance();
+		SSC_Calc_Cards_Admin::get_instance();
 	}
 	SSC_Frontend::get_instance();
 }
 add_action( 'plugins_loaded', 'ssc_init' );
+
+add_action( 'widgets_init', function () {
+	register_widget( 'SSC_Calc_Card_Widget' );
+} );
 
 // AJAX-хуки регистрируем здесь, чтобы они работали даже если singleton уже создан
 // Используем другое имя, чтобы не конфликтовать с админским ssc_load_category_attrs
@@ -237,4 +244,25 @@ function ssc_delete_calculator( $id ) {
 	$calculators = ssc_get_calculators();
 	unset( $calculators[ $id ] );
 	update_option( SSC_OPTION_KEY, $calculators );
+}
+
+/**
+ * Найти правило карточки калькулятора для категории товаров.
+ * Если для категории нет правила — рекурсивно проверяет родителя.
+ *
+ * @param WP_Term $term  Термин product_cat.
+ * @return array|null    Правило или null если карточка не нужна.
+ */
+function ssc_find_card_rule( WP_Term $term ): ?array {
+	$rules = get_option( 'ssc_calc_card_rules', [] );
+	if ( isset( $rules[ $term->slug ] ) ) {
+		return $rules[ $term->slug ];
+	}
+	if ( $term->parent ) {
+		$parent = get_term( $term->parent, 'product_cat' );
+		if ( $parent && ! is_wp_error( $parent ) ) {
+			return ssc_find_card_rule( $parent );
+		}
+	}
+	return null;
 }

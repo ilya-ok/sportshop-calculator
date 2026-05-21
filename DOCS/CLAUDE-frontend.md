@@ -166,3 +166,33 @@ if (!$subSelect.length) {
 **Canvas** — рисует шахматную раскладку рулонов. Ось X = длина (L), ось Y = ширина (W). При `rL >= L` вертикальные линии не рисуются. Canvas прозрачный (`ctx.clearRect`), фоновое изображение — HTML `<img>` под ним.
 
 **pdfMake** — подключается из `assets/pdfmake/`. Fallback: тема — `/pdfmake/pdfmake.min.js`. Magnific Popup: тема — `/assets/js/jquery.magnific-popup.min.js`, fallback — CDN. Кнопка «Скачать PDF (тест)» есть только в `render_category_calculator()`, в `render_calculator_core()` её нет.
+
+## Подключение CSS (enqueue_assets)
+
+`enqueue_assets()` подключает ассеты в трёх сценариях:
+
+| Страница | Что подключается |
+|----------|-----------------|
+| Товар (`is_product()`) | calculator.css + все скрипты (pdfmake, magnific-popup, calculator.js) |
+| Категория с шорткодом | calculator.css + все скрипты |
+| Категория без шорткода (`is_product_category()`) | только calculator.css (скрипты не нужны) |
+
+На страницах категорий CSS нужен для виджета `SSC_Calc_Card_Widget` (классы `.ssc-calc-card`).
+
+## Виджет карточки (.ssc-calc-card)
+
+Стили карточки `ssc-calc-card` находятся в `calculator.css` (в конце файла). Это отдельный набор классов, не связанный с `spb-calc-card` из плагина page-builder — стили дублируются намеренно для независимости.
+
+| Класс | Элемент |
+|-------|---------|
+| `.ssc-calc-card` | корневой элемент-ссылка, `min-height: 90px`, тёмный фон `#1a2535` |
+| `.ssc-calc-card__bg` | фоновое изображение, абсолютное позиционирование, анимация scale при hover |
+| `.ssc-calc-card__overlay` | многослойный градиент-оверлей |
+| `.ssc-calc-card__deco` | декоративная угловая сетка (правый верхний угол) |
+| `.ssc-calc-card__body` | flex-контейнер контента, `padding: 28px`, `justify-content: flex-end` |
+| `.ssc-calc-card__text` | обёртка заголовка + подзаголовка |
+| `.ssc-calc-card__title` | заголовок, `font-size: 24px` |
+| `.ssc-calc-card__subtitle` | подзаголовок, `color: #f0851a` |
+| `.ssc-calc-card__footer` | область тега, `border-top` |
+| `.ssc-calc-card__tag` | тег-бейдж с иконкой SVG |
+| `.ssc-calc-card--no-image` | модификатор при отсутствии фона — градиент `#1a2535 → #243447` |

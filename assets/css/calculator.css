@@ -88,13 +88,13 @@
     box-shadow: 0 0 0 2px rgba(139,199,63,0.15);
 }
 
-.ssc-filter-wrap { margin-bottom: 12px; }
+.ssc-filter-wrap { margin-bottom: 12px; padding-top: 6px; }
 .ssc-filter-attr {
     display: flex;
-    align-items: center;
-    gap: 8px;
-    margin-bottom: 8px;
-    flex-wrap: wrap;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+    margin-bottom: 12px;
     transition: opacity 0.2s;
 }
 .ssc-filter-attr--loading {
@@ -622,7 +622,7 @@
     width: 170px;
 }
 .ssc-results--table .ssc-result-row.ssc-res-glue-base, .ssc-results--table .ssc-result-row.ssc-res-tape-base {
-    // border: none;
+    /* border: none; */
 }
 
 /* Обычные строки (рулоны, швы) без цен */
@@ -882,4 +882,162 @@
     .ssc-scenic-sub .ssc-markup-type-list {
         gap: 4px;
     }
+}
+
+/* ==========================================================================
+   Карточка калькулятора (.ssc-calc-card)
+   Используется виджетом SSC_Calc_Card_Widget
+   ========================================================================== */
+
+.ssc-calc-card {
+	position: relative;
+	display: flex;
+	flex-direction: column;
+	overflow: hidden;
+	border-radius: 5px;
+	background-color: #1a2535;
+	min-height: 90px;
+	text-decoration: none;
+	color: #fff;
+	box-shadow: 0 1px 2px rgba(0, 0, 0, .25);
+}
+
+.ssc-calc-card:hover {
+	color: #fff;
+	text-decoration: none;
+}
+
+.ssc-calc-card__bg {
+	position: absolute;
+	inset: 0;
+	z-index: 0;
+	background-size: cover;
+	background-position: center;
+	background-repeat: no-repeat;
+	transform-origin: center;
+	transition: transform .6s cubic-bezier(.25,.46,.45,.94);
+}
+
+.ssc-calc-card:hover .ssc-calc-card__bg {
+	transform: scale(1.07);
+}
+
+.ssc-calc-card__overlay {
+	position: absolute;
+	inset: 0;
+	z-index: 1;
+	background:
+		linear-gradient(180deg, rgba(0,0,0,.18) 0%, transparent 35%),
+		linear-gradient(0deg, rgba(10,15,30,.90) 0%, rgba(10,15,30,.55) 55%, transparent 100%);
+	transition: background .35s ease;
+}
+
+.ssc-calc-card:hover .ssc-calc-card__overlay {
+	background:
+		linear-gradient(180deg, rgba(0,0,0,.22) 0%, transparent 35%),
+		linear-gradient(0deg, rgba(10,15,30,.96) 0%, rgba(10,15,30,.65) 55%, transparent 100%);
+}
+
+.ssc-calc-card__deco {
+	position: absolute;
+	top: -32px;
+	right: -32px;
+	width: 180px;
+	height: 180px;
+	z-index: 2;
+	border-radius: 50%;
+	background: radial-gradient(circle at 70% 30%, rgba(255,255,255,.07) 0%, transparent 70%);
+	mask-image:
+		repeating-linear-gradient(0deg, transparent, transparent 14px, rgba(255,255,255,.15) 14px, rgba(255,255,255,.15) 15px),
+		repeating-linear-gradient(90deg, transparent, transparent 14px, rgba(255,255,255,.15) 14px, rgba(255,255,255,.15) 15px);
+	border: 1px solid rgba(255,255,255,.06);
+	transition: transform .35s ease, opacity .35s ease;
+	opacity: .6;
+}
+
+.ssc-calc-card:hover .ssc-calc-card__deco {
+	transform: scale(1.15) rotate(8deg);
+	opacity: 1;
+}
+
+.ssc-calc-card__body {
+	position: relative;
+	z-index: 3;
+	display: flex;
+	flex-direction: column;
+	justify-content: flex-end;
+	flex: 1;
+	gap: 10px;
+	padding: 28px 28px 24px;
+}
+
+.ssc-calc-card__tag {
+	display: inline-flex;
+	align-items: center;
+	gap: 5px;
+	align-self: flex-start;
+	padding: 5px 11px 5px 9px;
+	background: rgba(255,255,255,.12);
+	backdrop-filter: blur(6px);
+	-webkit-backdrop-filter: blur(6px);
+	border: 1px solid rgba(255,255,255,.18);
+	border-radius: 20px;
+	font-size: 11px;
+	line-height: 1;
+	font-weight: 600;
+	letter-spacing: .06em;
+	text-transform: uppercase;
+	color: rgba(255,255,255,.9);
+	transition: background .25s, border-color .25s;
+}
+
+.ssc-calc-card:hover .ssc-calc-card__tag {
+	background: rgba(255,255,255,.2);
+	border-color: rgba(255,255,255,.3);
+}
+
+.ssc-calc-card__tag-icon {
+	flex-shrink: 0;
+	opacity: .85;
+	display: block;
+}
+
+.ssc-calc-card__text {
+	display: flex;
+	flex-direction: column;
+	gap: 8px;
+}
+
+.ssc-calc-card__title {
+	margin: 0;
+	font-size: 24px;
+	font-weight: 700;
+	line-height: 1.2;
+	color: inherit;
+}
+
+.ssc-calc-card__subtitle {
+	margin: 0;
+	font-size: 16px;
+	line-height: 1.5;
+	color: #f0851a;
+}
+
+.ssc-calc-card__footer {
+	border-top: 1px solid rgba(255,255,255,.12);
+	padding-top: 10px;
+}
+
+.ssc-calc-card--no-image {
+	background-image: linear-gradient(135deg, #1a2535 0%, #243447 100%);
+}
+
+@media (max-width: 768px) {
+	.ssc-calc-card { min-height: 90px; }
+	.ssc-calc-card__body { padding: 20px 20px 18px; }
+	.ssc-calc-card__title { font-size: 20px; }
+}
+
+.widget_ssc_calc_card {
+	padding: 0 !important;
 }
