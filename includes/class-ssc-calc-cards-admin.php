@@ -186,6 +186,47 @@ class SSC_Calc_Cards_Admin {
 			</form>
 		</div>
 
+		<style>
+		.ssc-cards-toggle {
+			background: none;
+			border: none;
+			cursor: pointer;
+			padding: 0 4px 0 0;
+			font-size: 11px;
+			color: #666;
+			line-height: 1;
+			vertical-align: middle;
+			transition: transform 0.15s;
+		}
+		.ssc-cards-toggle.ssc-open { transform: rotate(90deg); }
+		</style>
+		<script>
+		jQuery(document).ready(function($) {
+			function hideDescendants(id) {
+				$('[data-ssc-child-of="' + id + '"]').each(function() {
+					var childId = $(this).data('ssc-id');
+					$(this).hide();
+					if ( childId ) {
+						hideDescendants( childId );
+						$('.ssc-cards-toggle[data-ssc-toggle="' + childId + '"]').removeClass('ssc-open');
+					}
+				});
+			}
+
+			$(document).on('click', '.ssc-cards-toggle', function() {
+				var $btn = $(this);
+				var id   = $btn.data('ssc-toggle');
+				if ( $btn.hasClass('ssc-open') ) {
+					$btn.removeClass('ssc-open');
+					hideDescendants( id );
+				} else {
+					$btn.addClass('ssc-open');
+					$('[data-ssc-child-of="' + id + '"]').show();
+				}
+			});
+		});
+		</script>
+
 		<?php if ( is_multisite() ) : ?>
 		<script>
 		jQuery(document).ready(function($) {
@@ -219,13 +260,20 @@ class SSC_Calc_Cards_Admin {
 			return;
 		}
 		foreach ( $by_parent[ $parent_id ] as $term ) {
-			$slug = $term->slug;
-			$rule = $rules[ $slug ] ?? [];
-			$pad  = $depth > 0 ? str_repeat( '&nbsp;&nbsp;&nbsp;', $depth ) . '— ' : '';
+			$slug         = $term->slug;
+			$rule         = $rules[ $slug ] ?? [];
+			$has_children = ! empty( $by_parent[ $term->term_id ] );
+			$pad          = $depth > 0 ? str_repeat( '&nbsp;&nbsp;&nbsp;', $depth ) . '— ' : '';
+			$row_attr     = $depth > 0
+				? ' data-ssc-child-of="' . $parent_id . '" style="display:none"'
+				: '';
 			?>
-			<tr>
+			<tr data-ssc-id="<?php echo esc_attr( $term->term_id ); ?>"<?php echo $row_attr; ?>>
 				<td>
 					<?php echo $pad; ?>
+					<?php if ( $has_children ) : ?>
+						<button type="button" class="ssc-cards-toggle" data-ssc-toggle="<?php echo esc_attr( $term->term_id ); ?>" title="Развернуть/свернуть подкатегории">▶</button>
+					<?php endif; ?>
 					<strong><?php echo esc_html( $term->name ); ?></strong><br>
 					<small style="color:#888"><?php echo esc_html( $slug ); ?></small>
 				</td>
