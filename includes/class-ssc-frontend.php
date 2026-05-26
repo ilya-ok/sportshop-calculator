@@ -1138,21 +1138,20 @@ class SSC_Frontend {
 			wp_send_json_error( 'Category not found' );
 		}
 
-		// Строим WP_Query с tax_query
-		$tax_query = array(
-			array(
-				'taxonomy' => 'product_cat',
-				'field'    => 'term_id',
-				'terms'    => $term->term_id,
-			),
+		// Базовый фильтр по категории
+		$base_term_filter = array(
+			'taxonomy' => 'product_cat',
+			'field'    => 'term_id',
+			'terms'    => $term->term_id,
 		);
 
-		// Добавляем фильтры по атрибутам
+		// Атрибутные фильтры отдельно (нужны для conjunctive facets)
+		$attr_filters_tax = array();
 		foreach ( $filters as $attr_slug => $values ) {
 			$attr_slug = sanitize_key( $attr_slug );
 			$values    = array_map( 'sanitize_title', (array) $values );
 			if ( ! empty( $values ) ) {
-				$tax_query[] = array(
+				$attr_filters_tax[ $attr_slug ] = array(
 					'taxonomy' => 'pa_' . $attr_slug,
 					'field'    => 'slug',
 					'terms'    => $values,
@@ -1161,6 +1160,9 @@ class SSC_Frontend {
 			}
 		}
 
+		// Основной tax_query: все фильтры (для отображения товаров)
+		$tax_query             = array_values( $attr_filters_tax );
+		$tax_query[]           = $base_term_filter;
 		$tax_query['relation'] = 'AND';
 
 		// Генерируем стабильный ключ кеша (сортируем фильтры)
@@ -1276,22 +1278,32 @@ class SSC_Frontend {
 			);
 		}
 
+		// Conjunctive facets: для каждого атрибута считаем доступные значения
+		// из товаров, отфильтрованных по ВСЕМ атрибутам КРОМЕ текущего.
 		$available_filters = array();
 		foreach ( $attr_definitions as $attr_slug => $taxonomy ) {
-			$available_filters[ $attr_slug ] = array();
-			foreach ( $products as $p ) {
-				$prod = wc_get_product( $p->ID );
-				if ( ! $prod ) {
-					continue;
+			$tq = array( 'relation' => 'AND', $base_term_filter );
+			foreach ( $attr_filters_tax as $slug => $filter ) {
+				if ( $slug !== $attr_slug ) {
+					$tq[] = $filter;
 				}
-				$vals = wc_get_product_terms( $prod->get_id(), $taxonomy, array( 'fields' => 'slugs' ) );
-				if ( ! is_wp_error( $vals ) ) {
-					foreach ( $vals as $v ) {
-						$available_filters[ $attr_slug ][] = $v;
+			}
+			$ids = get_posts( array(
+				'post_type'      => 'product',
+				'posts_per_page' => -1,
+				'fields'         => 'ids',
+				'tax_query'      => $tq,
+			) );
+			$vals = array();
+			foreach ( $ids as $pid ) {
+				$terms = wc_get_product_terms( $pid, $taxonomy, array( 'fields' => 'slugs' ) );
+				if ( ! is_wp_error( $terms ) ) {
+					foreach ( $terms as $v ) {
+						$vals[] = $v;
 					}
 				}
 			}
-			$available_filters[ $attr_slug ] = array_values( array_unique( $available_filters[ $attr_slug ] ) );
+			$available_filters[ $attr_slug ] = array_values( array_unique( $vals ) );
 		}
 
 		$result = array(

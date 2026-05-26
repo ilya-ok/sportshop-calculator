@@ -92,6 +92,19 @@
                 }
             });
 
+            // Переключение значения внутри одной группы атрибутов (radio-поведение)
+            this.$wrap.on('click', '.ssc-filter-check', function (e) {
+                var $label   = $(this);
+                var $input   = $label.find('.ssc-filter-cb');
+                if ($input.prop('checked')) return; // клик по уже выбранному — снять выбор, обычное поведение
+                var $group   = $label.closest('.ssc-filter-attr');
+                var $current = $group.find('.ssc-filter-cb:checked');
+                if (!$current.length) return; // в группе ничего не выбрано — обычное поведение
+                e.preventDefault();
+                $current.prop('checked', false);
+                $input.prop('disabled', false).prop('checked', true).trigger('change');
+            });
+
             // Фильтры (категория) — динамически загруженные
             this.$wrap.on('change', '.ssc-filter-cb', function () {
                 // Дизейблим все остальные группы атрибутов на время загрузки
