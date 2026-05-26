@@ -781,6 +781,11 @@ class SSC_Frontend {
 			<span class="ssc-result-sub"><span class="ssc-result-val ssc-res-seams">0 м.п.</span></span>
 			<span class="ssc-result-price"></span>
 		</div>
+		<div class="ssc-result-row ssc-result-row--info ssc-res-row-leftover" style="display:none">
+			<span class="ssc-result-label"><?php esc_html_e( 'Остаток рулона:', 'ssc' ); ?></span>
+			<span class="ssc-result-sub"><span class="ssc-result-val ssc-res-leftover"></span></span>
+			<span class="ssc-result-price"></span>
+		</div>
 		<?php endif; ?>
 
 		<!-- Площадь -->

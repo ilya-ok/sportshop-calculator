@@ -573,6 +573,9 @@
 .ssc-results--table .ssc-result-row--info {
     grid-template-columns: 1fr auto;
 }
+.ssc-res-row-leftover {
+    display: none !important;
+}
 
 .ssc-results--table .ssc-result-sub {
     display: flex;

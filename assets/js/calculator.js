@@ -623,21 +623,20 @@
             var hSeamsCount  = stripsCount - 1;
             var hSeamLen     = hSeamsCount * L;
 
-            /* --- Вертикальные стыки (шахматный порядок) ---
-               Нечётные полосы: первый шов на rL, затем через rL
-               Чётные полосы: первый шов на rL/2, затем через rL */
-            var styk_odd = 0, styk_even = 0, xi;
-            if (rL < L) {
-                xi = rL;
-                while (xi < L) { styk_odd++;  xi += rL; }
-                xi = rL / 2;
-                while (xi < L) { styk_even++; xi += rL; }
+            /* --- Вертикальные стыки (алгоритм остатков) ---
+               Остаток рулона переходит в следующую полосу. */
+            var totalStyk = 0, lo = 0;
+            for (var si = 0; si < stripsCount; si++) {
+                var sPos = 0;
+                while (sPos < L) {
+                    var piece = lo > 0 ? Math.min(lo, L - sPos) : Math.min(rL, L - sPos);
+                    if (lo > 0) { lo -= piece; } else { lo = rL - piece; }
+                    sPos += piece;
+                    if (sPos < L) totalStyk++;
+                }
             }
-
-            var oddStripsCount  = Math.ceil(stripsCount / 2);
-            var evenStripsCount = Math.floor(stripsCount / 2);
-            var totalStyk  = oddStripsCount * styk_odd + evenStripsCount * styk_even;
-            var vSeamLen   = totalStyk * rW;
+            var rollLeftover = lo;
+            var vSeamLen = totalStyk * rW;
 
             var totalSeamLen = hSeamLen + vSeamLen;
 
@@ -706,6 +705,7 @@
                 hSeamsCount:     hSeamsCount,
                 totalStyk:       totalStyk,
                 totalSeamLen:    totalSeamLen,
+                rollLeftover:    rollLeftover,
                 markupType:      markupType,
                 markupCount:     markupCount,
                 // Клей (общий)
@@ -769,14 +769,17 @@
                 stripsCount = Math.ceil(W / rW);
                 hSeamsCount = stripsCount - 1;
                 var hSeamLen = hSeamsCount * L;
-                var styk_odd = 0, styk_even = 0, xi;
-                if (rL < L) {
-                    xi = rL;     while (xi < L) { styk_odd++;  xi += rL; }
-                    xi = rL / 2; while (xi < L) { styk_even++; xi += rL; }
+                var lo = 0;
+                for (var si = 0; si < stripsCount; si++) {
+                    var sPos = 0;
+                    while (sPos < L) {
+                        var piece = lo > 0 ? Math.min(lo, L - sPos) : Math.min(rL, L - sPos);
+                        if (lo > 0) { lo -= piece; } else { lo = rL - piece; }
+                        sPos += piece;
+                        if (sPos < L) totalStyk++;
+                    }
                 }
-                var oddStripsCount  = Math.ceil(stripsCount / 2);
-                var evenStripsCount = Math.floor(stripsCount / 2);
-                totalStyk    = oddStripsCount * styk_odd + evenStripsCount * styk_even;
+                var rollLeftover = lo;
                 var vSeamLen = totalStyk * rW;
                 totalSeamLen = hSeamLen + vSeamLen;
             }
@@ -807,6 +810,7 @@
                 hSeamsCount:  hSeamsCount,
                 totalStyk:    totalStyk,
                 totalSeamLen: totalSeamLen,
+                rollLeftover: rollLeftover || 0,
                 glueCount:    glueCount,
                 glueKgDisplay: glueKgDisplay,
                 glueCost:     glueCost
@@ -826,6 +830,12 @@
                 $r.find('.ssc-res-seams').text(
                     res.totalSeamLen.toFixed(1) + ' м.п. (горизонтальные: ' + res.hSeamsCount + ' шт., вертикальные: ' + res.totalStyk + ' шт.)'
                 );
+                if (res.rollLeftover > 0) {
+                    $r.find('.ssc-res-leftover').text(res.rollLeftover.toFixed(2) + ' м');
+                    $r.find('.ssc-res-row-leftover').show();
+                } else {
+                    $r.find('.ssc-res-row-leftover').hide();
+                }
             }
             $r.find('.ssc-res-area').text(Math.round(res.area) + ' м²');
             $r.find('.ssc-res-grass-cost').text(this._fmt(res.grassBaseCost) + ' руб.');
@@ -857,14 +867,17 @@
             var hSeamLen    = hSeamsCount * L;
 
             /* --- Вертикальные стыки (шахматный порядок) --- */
-            var styk_odd = 0, styk_even = 0, xi;
-            if (rL < L) {
-                xi = rL;     while (xi < L) { styk_odd++;  xi += rL; }
-                xi = rL / 2; while (xi < L) { styk_even++; xi += rL; }
+            var totalStyk = 0, lo = 0;
+            for (var si = 0; si < stripsCount; si++) {
+                var sPos = 0;
+                while (sPos < L) {
+                    var piece = lo > 0 ? Math.min(lo, L - sPos) : Math.min(rL, L - sPos);
+                    if (lo > 0) { lo -= piece; } else { lo = rL - piece; }
+                    sPos += piece;
+                    if (sPos < L) totalStyk++;
+                }
             }
-            var oddStripsCount  = Math.ceil(stripsCount / 2);
-            var evenStripsCount = Math.floor(stripsCount / 2);
-            var totalStyk    = oddStripsCount * styk_odd + evenStripsCount * styk_even;
+            var rollLeftover = lo;
             var vSeamLen     = totalStyk * rW;
             var totalSeamLen = hSeamLen + vSeamLen;
 
@@ -904,6 +917,7 @@
                 hSeamsCount:  hSeamsCount,
                 totalStyk:    totalStyk,
                 totalSeamLen: totalSeamLen,
+                rollLeftover: rollLeftover,
                 // Клей
                 glueKg:    glueKg,
                 glueCost:  glueCost,
@@ -947,14 +961,17 @@
             var hSeamsCount = stripsCount - 1;
             var hSeamLen    = hSeamsCount * L;
 
-            var styk_odd = 0, styk_even = 0, xi;
-            if (rL < L) {
-                xi = rL;     while (xi < L) { styk_odd++;  xi += rL; }
-                xi = rL / 2; while (xi < L) { styk_even++; xi += rL; }
+            var totalStyk = 0, lo = 0;
+            for (var si = 0; si < stripsCount; si++) {
+                var sPos = 0;
+                while (sPos < L) {
+                    var piece = lo > 0 ? Math.min(lo, L - sPos) : Math.min(rL, L - sPos);
+                    if (lo > 0) { lo -= piece; } else { lo = rL - piece; }
+                    sPos += piece;
+                    if (sPos < L) totalStyk++;
+                }
             }
-            var oddStripsCount  = Math.ceil(stripsCount / 2);
-            var evenStripsCount = Math.floor(stripsCount / 2);
-            var totalStyk    = oddStripsCount * styk_odd + evenStripsCount * styk_even;
+            var rollLeftover = lo;
             var vSeamLen     = totalStyk * rW;
             var totalSeamLen = hSeamLen + vSeamLen;
 
@@ -1039,6 +1056,7 @@
                 hSeamsCount:   hSeamsCount,
                 totalStyk:     totalStyk,
                 totalSeamLen:  totalSeamLen,
+                rollLeftover:  rollLeftover,
                 // Основание
                 baseType:    baseType,
                 baseKg:      baseKg,
@@ -1086,6 +1104,12 @@
             $r.find('.ssc-res-seams').text(
                 res.totalSeamLen.toFixed(1) + ' м.п. (горизонтальные: ' + res.hSeamsCount + ' шт., вертикальные: ' + res.totalStyk + ' шт.)'
             );
+            if (res.rollLeftover > 0) {
+                $r.find('.ssc-res-leftover').text(res.rollLeftover.toFixed(2) + ' м');
+                $r.find('.ssc-res-row-leftover').show();
+            } else {
+                $r.find('.ssc-res-row-leftover').hide();
+            }
             $r.find('.ssc-res-area').text(Math.round(res.area) + ' м²');
             $r.find('.ssc-res-grass-cost').text(this._fmt(res.grassBaseCost) + ' руб.');
 
@@ -1132,6 +1156,12 @@
             $r.find('.ssc-res-seams').text(
                 res.totalSeamLen.toFixed(1) + ' м.п. (горизонтальные: ' + res.hSeamsCount + ' шт., вертикальные: ' + res.totalStyk + ' шт.)'
             );
+            if (res.rollLeftover > 0) {
+                $r.find('.ssc-res-leftover').text(res.rollLeftover.toFixed(2) + ' м');
+                $r.find('.ssc-res-row-leftover').show();
+            } else {
+                $r.find('.ssc-res-row-leftover').hide();
+            }
 
             $r.find('.ssc-res-area').text(Math.round(res.area) + ' м²');
             $r.find('.ssc-res-grass-cost').text(this._fmt(res.grassBaseCost) + ' руб.');
@@ -1234,6 +1264,12 @@
             // Рулоны и швы (без цен)
             $r.find('.ssc-res-rolls').text(res.rollCount + ' шт');
             $r.find('.ssc-res-seams').text(res.totalSeamLen.toFixed(1) + ' м.п. (горизонтальные: ' + res.hSeamsCount + ' шт., вертикальные: ' + res.totalStyk + ' шт.)');
+            if (res.rollLeftover > 0) {
+                $r.find('.ssc-res-leftover').text(res.rollLeftover.toFixed(2) + ' м');
+                $r.find('.ssc-res-row-leftover').show();
+            } else {
+                $r.find('.ssc-res-row-leftover').hide();
+            }
 
             // Площадь
             $r.find('.ssc-res-area').text(Math.round(res.area) + ' м²');
@@ -1368,10 +1404,12 @@
             ctx.lineWidth   = 1.5;
             ctx.strokeStyle = '#ffff00';
 
+            var drawLo = 0; // остаток рулона, переходящий между полосами
+
             for (var s = 0; s < stripsCount; s++) {
                 var y0 = Math.round(s * rW * scaleY);
                 var y1 = Math.round(Math.min((s + 1) * rW, Aw) * scaleY);
-                var isOdd = (s % 2 === 0); // 0-indexed: чётный индекс = нечётная полоса
+                var isOdd = (s % 2 === 0);
 
                 // Чередующийся фон полос
                 ctx.fillStyle = isOdd ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.08)';
@@ -1388,21 +1426,23 @@
                     ctx.stroke();
                 }
 
-                // Вертикальные швы — шахматный сдвиг (только если рулон короче площадки)
-                if (rL < L) {
-                    var xStart = isOdd ? rL * scaleX : (rL / 2) * scaleX;
-                    var xi = xStart;
-                    ctx.strokeStyle = 'rgba(255,220,0,0.7)';
-                    ctx.lineWidth   = 1.5;
-                    ctx.setLineDash([4, 4]);
-                    while (xi < CW) {
+                // Вертикальные швы — алгоритм остатков
+                ctx.strokeStyle = 'rgba(255,220,0,0.7)';
+                ctx.lineWidth   = 1.5;
+                ctx.setLineDash([4, 4]);
+                var dPos = 0, dLo = drawLo;
+                while (dPos < L) {
+                    var dPiece = dLo > 0 ? Math.min(dLo, L - dPos) : Math.min(rL, L - dPos);
+                    if (dLo > 0) { dLo -= dPiece; } else { dLo = rL - dPiece; }
+                    dPos += dPiece;
+                    if (dPos < L) {
                         ctx.beginPath();
-                        ctx.moveTo(Math.round(xi), y0);
-                        ctx.lineTo(Math.round(xi), y1);
+                        ctx.moveTo(Math.round(dPos * scaleX), y0);
+                        ctx.lineTo(Math.round(dPos * scaleX), y1);
                         ctx.stroke();
-                        xi += rL * scaleX;
                     }
                 }
+                drawLo = dLo;
             }
 
             ctx.setLineDash([]);
