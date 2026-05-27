@@ -356,12 +356,12 @@ class SSC_Frontend {
 						<?php if ( $is_linoleum ) : ?>
 						<label class="ssc-radio-btn">
 							<input type="radio" name="ssc_markup_type_<?php echo $calc_id; ?>" value="volleyball">
-							<img src="<?php echo esc_url( $ssc_img . 'volleyball.png' ); ?>" class="ssc-markup-icon" alt="">
+							<img src="<?php echo esc_url( $ssc_img . 'volleyball.svg' ); ?>" class="ssc-markup-icon" alt="">
 							<span><?php esc_html_e( 'Волейбол', 'ssc' ); ?></span>
 						</label>
 						<label class="ssc-radio-btn">
 							<input type="radio" name="ssc_markup_type_<?php echo $calc_id; ?>" value="basketball">
-							<img src="<?php echo esc_url( $ssc_img . 'basketball.png' ); ?>" class="ssc-markup-icon" alt="">
+							<img src="<?php echo esc_url( $ssc_img . 'basketball.svg' ); ?>" class="ssc-markup-icon" alt="">
 							<span><?php esc_html_e( 'Баскетбол', 'ssc' ); ?></span>
 						</label>
 						<label class="ssc-radio-btn">
@@ -776,14 +776,14 @@ class SSC_Frontend {
 			<span class="ssc-result-sub"><span class="ssc-result-val ssc-res-rolls">0 шт</span></span>
 			<span class="ssc-result-price"></span>
 		</div>
+		<div class="ssc-result-row ssc-result-row--info ssc-res-row-leftover" style="display:none">
+			<span class="ssc-result-label"><?php esc_html_e( 'Остаток материала:', 'ssc' ); ?></span>
+			<span class="ssc-result-sub"><span class="ssc-result-val ssc-res-leftover"></span></span>
+			<span class="ssc-result-price"></span>
+		</div>
 		<div class="ssc-result-row ssc-result-row--info">
 			<span class="ssc-result-label"><?php esc_html_e( 'Длина швов:', 'ssc' ); ?></span>
 			<span class="ssc-result-sub"><span class="ssc-result-val ssc-res-seams">0 м.п.</span></span>
-			<span class="ssc-result-price"></span>
-		</div>
-		<div class="ssc-result-row ssc-result-row--info ssc-res-row-leftover" style="display:none">
-			<span class="ssc-result-label"><?php esc_html_e( 'Остаток рулона:', 'ssc' ); ?></span>
-			<span class="ssc-result-sub"><span class="ssc-result-val ssc-res-leftover"></span></span>
 			<span class="ssc-result-price"></span>
 		</div>
 		<?php endif; ?>

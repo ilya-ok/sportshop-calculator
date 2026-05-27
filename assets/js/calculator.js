@@ -70,6 +70,9 @@
                 var $checkedLength = this.$wrap.find('input[name="ssc_length_' + this.calcId + '"]:checked');
                 this.rollLength = $checkedLength.length ? parseFloat($checkedLength.val()) : (this.product.defaultLength || 0);
                 this.$wrap.find('.ssc-form-product-name').val(this.product.name || '');
+                var mW = this.product.widths  && this.product.widths.length  > 1;
+                var mL = this.product.lengths && this.product.lengths.length > 1;
+                this.$wrap.find('.ssc-roll-params').toggleClass('ssc-roll-params--inline', !mW && !mL);
                 this.calculate();
             }
         },
@@ -540,6 +543,12 @@
                 this.$wrap.find('#ssc-length-input-' + this.calcId).val(this.rollLength);
             }
 
+            // Компоновка: row если один вариант, column если несколько
+            var multiWidth  = product.widths  && product.widths.length  > 1;
+            var multiLength = product.lengths && product.lengths.length > 1;
+            this.$wrap.find('.ssc-roll-params')
+                .toggleClass('ssc-roll-params--inline', !multiWidth && !multiLength);
+
             this.$wrap.find('.ssc-step--roll').addClass('ssc-step--active');
             this.$wrap.find('.ssc-step--dims').addClass('ssc-step--active');
             this.$wrap.find('.ssc-form-product-name').val(product.name || '');
@@ -626,7 +635,10 @@
             /* --- Вертикальные стыки (алгоритм остатков) ---
                Остаток рулона переходит в следующую полосу. */
             var totalStyk = 0, lo = 0;
+            var fullStripsCnt = Math.floor(W / rW);
+            var rollLeftoverFull = 0;
             for (var si = 0; si < stripsCount; si++) {
+                if (si === fullStripsCnt) { rollLeftoverFull = lo; }
                 var sPos = 0;
                 while (sPos < L) {
                     var piece = lo > 0 ? Math.min(lo, L - sPos) : Math.min(rL, L - sPos);
@@ -636,6 +648,27 @@
                 }
             }
             var rollLeftover = lo;
+            var wRem = W % rW;
+            var leftoverArea, verifyLeftover;
+            if (wRem > 0.001) {
+                var cutsPerW = Math.floor(rW / wRem);
+                var fracW    = rW % wRem;
+                var avail    = cutsPerW * rollLeftoverFull;
+                var fRolls   = Math.ceil(fullStripsCnt * L / rL);
+                if (avail >= L) {
+                    leftoverArea   = parseFloat(((avail - L) * wRem + fracW * rollLeftoverFull).toFixed(2));
+                    verifyLeftover = parseFloat((fRolls * rW * rL - area).toFixed(2));
+                } else {
+                    var stillNeed  = L - avail;
+                    var mPerRoll   = cutsPerW * rL;
+                    var nRolls     = Math.ceil(stillNeed / mPerRoll);
+                    leftoverArea   = parseFloat(((nRolls * mPerRoll - stillNeed) * wRem + fracW * (rollLeftoverFull + nRolls * rL)).toFixed(2));
+                    verifyLeftover = parseFloat(((fRolls + nRolls) * rW * rL - area).toFixed(2));
+                }
+            } else {
+                leftoverArea   = parseFloat((rollLeftover * rW).toFixed(2));
+                verifyLeftover = parseFloat((Math.ceil(stripsCount * L / rL) * rW * rL - area).toFixed(2));
+            }
             var vSeamLen = totalStyk * rW;
 
             var totalSeamLen = hSeamLen + vSeamLen;
@@ -706,6 +739,8 @@
                 totalStyk:       totalStyk,
                 totalSeamLen:    totalSeamLen,
                 rollLeftover:    rollLeftover,
+                leftoverArea:    leftoverArea,
+                verifyLeftover:  verifyLeftover,
                 markupType:      markupType,
                 markupCount:     markupCount,
                 // Клей (общий)
@@ -770,7 +805,10 @@
                 hSeamsCount = stripsCount - 1;
                 var hSeamLen = hSeamsCount * L;
                 var lo = 0;
+                var fullStripsCnt = Math.floor(W / rW);
+                var rollLeftoverFull = 0;
                 for (var si = 0; si < stripsCount; si++) {
+                    if (si === fullStripsCnt) { rollLeftoverFull = lo; }
                     var sPos = 0;
                     while (sPos < L) {
                         var piece = lo > 0 ? Math.min(lo, L - sPos) : Math.min(rL, L - sPos);
@@ -780,6 +818,27 @@
                     }
                 }
                 var rollLeftover = lo;
+                var wRem = W % rW;
+                var leftoverArea, verifyLeftover;
+                if (wRem > 0.001) {
+                    var cutsPerW = Math.floor(rW / wRem);
+                    var fracW    = rW % wRem;
+                    var avail    = cutsPerW * rollLeftoverFull;
+                    var fRolls   = Math.ceil(fullStripsCnt * L / rL);
+                    if (avail >= L) {
+                        leftoverArea   = parseFloat(((avail - L) * wRem + fracW * rollLeftoverFull).toFixed(2));
+                        verifyLeftover = parseFloat((fRolls * rW * rL - area).toFixed(2));
+                    } else {
+                        var stillNeed  = L - avail;
+                        var mPerRoll   = cutsPerW * rL;
+                        var nRolls     = Math.ceil(stillNeed / mPerRoll);
+                        leftoverArea   = parseFloat(((nRolls * mPerRoll - stillNeed) * wRem + fracW * (rollLeftoverFull + nRolls * rL)).toFixed(2));
+                        verifyLeftover = parseFloat(((fRolls + nRolls) * rW * rL - area).toFixed(2));
+                    }
+                } else {
+                    leftoverArea   = parseFloat((rollLeftover * rW).toFixed(2));
+                    verifyLeftover = parseFloat((Math.ceil(stripsCount * L / rL) * rW * rL - area).toFixed(2));
+                }
                 var vSeamLen = totalStyk * rW;
                 totalSeamLen = hSeamLen + vSeamLen;
             }
@@ -810,7 +869,9 @@
                 hSeamsCount:  hSeamsCount,
                 totalStyk:    totalStyk,
                 totalSeamLen: totalSeamLen,
-                rollLeftover: rollLeftover || 0,
+                rollLeftover:  rollLeftover  || 0,
+                leftoverArea:  leftoverArea  || 0,
+                verifyLeftover: verifyLeftover || 0,
                 glueCount:    glueCount,
                 glueKgDisplay: glueKgDisplay,
                 glueCost:     glueCost
@@ -830,8 +891,8 @@
                 $r.find('.ssc-res-seams').text(
                     res.totalSeamLen.toFixed(1) + ' м.п. (горизонтальные: ' + res.hSeamsCount + ' шт., вертикальные: ' + res.totalStyk + ' шт.)'
                 );
-                if (res.rollLeftover > 0) {
-                    $r.find('.ssc-res-leftover').text(res.rollLeftover.toFixed(2) + ' м');
+                if (res.leftoverArea > 0) {
+                    $r.find('.ssc-res-leftover').text(res.leftoverArea.toFixed(2) + ' м² (пров.: ' + res.verifyLeftover.toFixed(2) + ' м²)');
                     $r.find('.ssc-res-row-leftover').show();
                 } else {
                     $r.find('.ssc-res-row-leftover').hide();
@@ -868,7 +929,10 @@
 
             /* --- Вертикальные стыки (шахматный порядок) --- */
             var totalStyk = 0, lo = 0;
+            var fullStripsCnt = Math.floor(W / rW);
+            var rollLeftoverFull = 0;
             for (var si = 0; si < stripsCount; si++) {
+                if (si === fullStripsCnt) { rollLeftoverFull = lo; }
                 var sPos = 0;
                 while (sPos < L) {
                     var piece = lo > 0 ? Math.min(lo, L - sPos) : Math.min(rL, L - sPos);
@@ -878,6 +942,27 @@
                 }
             }
             var rollLeftover = lo;
+            var wRem = W % rW;
+            var leftoverArea, verifyLeftover;
+            if (wRem > 0.001) {
+                var cutsPerW = Math.floor(rW / wRem);
+                var fracW    = rW % wRem;
+                var avail    = cutsPerW * rollLeftoverFull;
+                var fRolls   = Math.ceil(fullStripsCnt * L / rL);
+                if (avail >= L) {
+                    leftoverArea   = parseFloat(((avail - L) * wRem + fracW * rollLeftoverFull).toFixed(2));
+                    verifyLeftover = parseFloat((fRolls * rW * rL - area).toFixed(2));
+                } else {
+                    var stillNeed  = L - avail;
+                    var mPerRoll   = cutsPerW * rL;
+                    var nRolls     = Math.ceil(stillNeed / mPerRoll);
+                    leftoverArea   = parseFloat(((nRolls * mPerRoll - stillNeed) * wRem + fracW * (rollLeftoverFull + nRolls * rL)).toFixed(2));
+                    verifyLeftover = parseFloat(((fRolls + nRolls) * rW * rL - area).toFixed(2));
+                }
+            } else {
+                leftoverArea   = parseFloat((rollLeftover * rW).toFixed(2));
+                verifyLeftover = parseFloat((Math.ceil(stripsCount * L / rL) * rW * rL - area).toFixed(2));
+            }
             var vSeamLen     = totalStyk * rW;
             var totalSeamLen = hSeamLen + vSeamLen;
 
@@ -915,9 +1000,11 @@
                 rollCount:    rollCount,
                 stripsCount:  stripsCount,
                 hSeamsCount:  hSeamsCount,
-                totalStyk:    totalStyk,
-                totalSeamLen: totalSeamLen,
-                rollLeftover: rollLeftover,
+                totalStyk:     totalStyk,
+                totalSeamLen:  totalSeamLen,
+                rollLeftover:   rollLeftover,
+                leftoverArea:   leftoverArea,
+                verifyLeftover: verifyLeftover,
                 // Клей
                 glueKg:    glueKg,
                 glueCost:  glueCost,
@@ -962,7 +1049,10 @@
             var hSeamLen    = hSeamsCount * L;
 
             var totalStyk = 0, lo = 0;
+            var fullStripsCnt = Math.floor(W / rW);
+            var rollLeftoverFull = 0;
             for (var si = 0; si < stripsCount; si++) {
+                if (si === fullStripsCnt) { rollLeftoverFull = lo; }
                 var sPos = 0;
                 while (sPos < L) {
                     var piece = lo > 0 ? Math.min(lo, L - sPos) : Math.min(rL, L - sPos);
@@ -972,6 +1062,27 @@
                 }
             }
             var rollLeftover = lo;
+            var wRem = W % rW;
+            var leftoverArea, verifyLeftover;
+            if (wRem > 0.001) {
+                var cutsPerW = Math.floor(rW / wRem);
+                var fracW    = rW % wRem;
+                var avail    = cutsPerW * rollLeftoverFull;
+                var fRolls   = Math.ceil(fullStripsCnt * L / rL);
+                if (avail >= L) {
+                    leftoverArea   = parseFloat(((avail - L) * wRem + fracW * rollLeftoverFull).toFixed(2));
+                    verifyLeftover = parseFloat((fRolls * rW * rL - area).toFixed(2));
+                } else {
+                    var stillNeed  = L - avail;
+                    var mPerRoll   = cutsPerW * rL;
+                    var nRolls     = Math.ceil(stillNeed / mPerRoll);
+                    leftoverArea   = parseFloat(((nRolls * mPerRoll - stillNeed) * wRem + fracW * (rollLeftoverFull + nRolls * rL)).toFixed(2));
+                    verifyLeftover = parseFloat(((fRolls + nRolls) * rW * rL - area).toFixed(2));
+                }
+            } else {
+                leftoverArea   = parseFloat((rollLeftover * rW).toFixed(2));
+                verifyLeftover = parseFloat((Math.ceil(stripsCount * L / rL) * rW * rL - area).toFixed(2));
+            }
             var vSeamLen     = totalStyk * rW;
             var totalSeamLen = hSeamLen + vSeamLen;
 
@@ -1056,7 +1167,9 @@
                 hSeamsCount:   hSeamsCount,
                 totalStyk:     totalStyk,
                 totalSeamLen:  totalSeamLen,
-                rollLeftover:  rollLeftover,
+                rollLeftover:   rollLeftover,
+                leftoverArea:   leftoverArea,
+                verifyLeftover: verifyLeftover,
                 // Основание
                 baseType:    baseType,
                 baseKg:      baseKg,
@@ -1104,8 +1217,8 @@
             $r.find('.ssc-res-seams').text(
                 res.totalSeamLen.toFixed(1) + ' м.п. (горизонтальные: ' + res.hSeamsCount + ' шт., вертикальные: ' + res.totalStyk + ' шт.)'
             );
-            if (res.rollLeftover > 0) {
-                $r.find('.ssc-res-leftover').text(res.rollLeftover.toFixed(2) + ' м');
+            if (res.leftoverArea > 0) {
+                $r.find('.ssc-res-leftover').text(res.leftoverArea.toFixed(2) + ' м² (пров.: ' + res.verifyLeftover.toFixed(2) + ' м²)');
                 $r.find('.ssc-res-row-leftover').show();
             } else {
                 $r.find('.ssc-res-row-leftover').hide();
@@ -1156,8 +1269,8 @@
             $r.find('.ssc-res-seams').text(
                 res.totalSeamLen.toFixed(1) + ' м.п. (горизонтальные: ' + res.hSeamsCount + ' шт., вертикальные: ' + res.totalStyk + ' шт.)'
             );
-            if (res.rollLeftover > 0) {
-                $r.find('.ssc-res-leftover').text(res.rollLeftover.toFixed(2) + ' м');
+            if (res.leftoverArea > 0) {
+                $r.find('.ssc-res-leftover').text(res.leftoverArea.toFixed(2) + ' м² (пров.: ' + res.verifyLeftover.toFixed(2) + ' м²)');
                 $r.find('.ssc-res-row-leftover').show();
             } else {
                 $r.find('.ssc-res-row-leftover').hide();
@@ -1264,8 +1377,8 @@
             // Рулоны и швы (без цен)
             $r.find('.ssc-res-rolls').text(res.rollCount + ' шт');
             $r.find('.ssc-res-seams').text(res.totalSeamLen.toFixed(1) + ' м.п. (горизонтальные: ' + res.hSeamsCount + ' шт., вертикальные: ' + res.totalStyk + ' шт.)');
-            if (res.rollLeftover > 0) {
-                $r.find('.ssc-res-leftover').text(res.rollLeftover.toFixed(2) + ' м');
+            if (res.leftoverArea > 0) {
+                $r.find('.ssc-res-leftover').text(res.leftoverArea.toFixed(2) + ' м² (пров.: ' + res.verifyLeftover.toFixed(2) + ' м²)');
                 $r.find('.ssc-res-row-leftover').show();
             } else {
                 $r.find('.ssc-res-row-leftover').hide();

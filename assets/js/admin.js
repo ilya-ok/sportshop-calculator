@@ -69,9 +69,17 @@
         }
 
         var calcType = $('#ssc-calc-type').val() || 'grass';
-        var typesToRender = calcType === 'linoleum'
-            ? [{ key: 'none', label: 'Изображение площадки' }]
-            : markupTypes;
+        var linoleumMarkupTypes = [
+            { key: 'none',          label: 'Без разметки' },
+            { key: 'volleyball',    label: 'Волейбол' },
+            { key: 'basketball',    label: 'Баскетбол' },
+            { key: 'mini-football', label: 'Мини-футбол' },
+        ];
+        var typesToRender = (calcType === 'linoleum')
+            ? linoleumMarkupTypes
+            : (calcType === 'sceniclinoleum' || calcType === 'simple')
+                ? [{ key: 'none', label: 'Изображение площадки' }]
+                : markupTypes;
 
         var html = '';
         slugs.forEach(function (slug) {

@@ -367,6 +367,19 @@
     flex-direction: column;
     gap: 8px;
 }
+.ssc-roll-params--inline {
+    flex-direction: row;
+    align-items: center;
+    gap: 24px;
+    flex-wrap: wrap;
+}
+.ssc-roll-params--inline .ssc-roll-row {
+    gap: 0;
+}
+.ssc-roll-params--inline .ssc-roll-row__label {
+    min-width: unset;
+    padding-right: 15px;
+}
 .ssc-roll-row {
     display: flex;
     align-items: center;
@@ -573,10 +586,6 @@
 .ssc-results--table .ssc-result-row--info {
     grid-template-columns: 1fr auto;
 }
-.ssc-res-row-leftover {
-    display: none !important;
-}
-
 .ssc-results--table .ssc-result-sub {
     display: flex;
     align-items: center;
